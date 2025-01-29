@@ -1,0 +1,62 @@
+
+with all_years as (
+select * 
+from bike_share_yr_0
+union all
+select *
+from bike_share_yr_1)
+
+select distinct month(try_cast(dteday as date)) as month_number, 
+       season, 
+	   a.yr, 
+	   weekday, 
+	   hr, 
+	   rider_type, 
+	   riders, 
+	   price, 
+	   COGS,
+       riders*price as revenue, 
+	   riders*price - COGS as profit
+from all_years as a
+left join cost_table as b
+on a.yr = b.yr
+where month(try_cast(dteday as date)) is not null;
+
+
+SELECT TOP 5 * FROM sales;
+
+SELECT FORMAT(CAST(Date as DATE), 'MMM') AS Month, SUM(GrossIncome) AS revenue
+FROM sales
+GROUP BY FORMAT(CAST(Date as DATE), 'MMM');
+
+
+SELECT TOP 100 * FROM sales;
+SELECT Gender, SUM(CAST(TotalCost AS FLOAT)) AS total_cost
+FROM sales 
+GROUP BY Gender 
+ORDER BY total_cost DESC;
+
+
+SELECT Gender, SUM(TRY_CAST(TotalCost AS FLOAT)) AS total_cost
+FROM sales 
+WHERE ISNUMERIC(YourColumn) = 1
+GROUP BY Gender 
+ORDER BY total_cost DESC;
+
+SELECT Gender,
+   SUM(CASE 
+        WHEN ISNUMERIC(TotalCost) = 1 THEN TRY_CAST(TotalCost AS FLOAT)
+        ELSE NULL 
+    END) AS Total_Cost
+FROM sales
+WHERE TotalCost IS NOT NULL AND LTRIM(RTRIM(TotalCost)) != ''
+GROUP BY Gender;
+
+SELECT Gender, ROUND(SUM(GrossIncome),2) AS total_income
+FROM sales 
+GROUP BY Gender;
+
+SELECT City, ROUND(SUM(GrossIncome),2) AS income_by_city
+FROM sales 
+GROUP BY City 
+ORDER BY sales_by_city DESC;
